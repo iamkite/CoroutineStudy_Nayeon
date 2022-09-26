@@ -15,5 +15,5 @@ Jetpack Compose
 MVVM, Kotlin
 
 **API**  
-Naver Developers - 검색
-https://developers.naver.com/products/service-api/search/search.md#%EA%B2%80%EC%83%89
+Naver Developers - 검색  
+https://developers.naver.com/products/service-api/search/search.md
