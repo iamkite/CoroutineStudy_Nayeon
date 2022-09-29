@@ -12,7 +12,7 @@ Hilt
 Jetpack Compose
 
 **ETC**  
-MVVM, Kotlin
+MVVM, Kotlin, Retrofit, Glide
 
 **API**  
 Naver Developers - 검색  
