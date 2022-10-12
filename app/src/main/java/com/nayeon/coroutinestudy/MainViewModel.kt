@@ -1,5 +1,6 @@
 package com.nayeon.coroutinestudy
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,14 +15,12 @@ class MainViewModel @Inject constructor(
     private val searchApi: SearchApi
 ) : ViewModel() {
 
+    val searchText = mutableStateOf("")
+
     private val _link = MutableLiveData<String?>()
     val link : LiveData<String?> get() = _link
 
-    init {
-        getOneImageUrl("apple")
-    }
-
-    private fun getOneImageUrl(query: String?) {
+    fun getOneImageUrl(query: String?) {
         viewModelScope.launch {
             if (query.isNullOrEmpty()) {
                 _link.postValue(null)
