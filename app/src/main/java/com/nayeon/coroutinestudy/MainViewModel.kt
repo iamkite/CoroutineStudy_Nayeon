@@ -1,34 +1,25 @@
 package com.nayeon.coroutinestudy
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
+import androidx.paging.liveData
 import com.nayeon.coroutinestudy.api.SearchApi
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val searchApi: SearchApi
 ) : ViewModel() {
-
     val searchText = mutableStateOf("")
+    val query = MutableLiveData<String>()
 
-    private val _link = MutableLiveData<String?>()
-    val link : LiveData<String?> get() = _link
-
-    fun getOneImageUrl(query: String?) {
-        viewModelScope.launch {
-            if (query.isNullOrEmpty()) {
-                _link.postValue(null)
-            } else {
-                val imageSearchResponse = searchApi.searchOneImage(query = query)
-                val link = imageSearchResponse.items[0].link
-                _link.postValue(link)
-            }
-        }
-    }
+    val imageFlow = query.switchMap {
+        Pager(PagingConfig(pageSize = 10)) {
+            ImageDataSource(searchApi, it)
+        }.liveData.cachedIn(viewModelScope)
+    }.asFlow()
 }

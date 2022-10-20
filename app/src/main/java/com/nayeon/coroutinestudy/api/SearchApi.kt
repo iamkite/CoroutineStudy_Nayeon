@@ -7,11 +7,11 @@ import retrofit2.http.Query
 
 interface SearchApi {
     @GET("v1/search/image")
-    suspend fun searchOneImage(
+    suspend fun searchImage(
         @Header("X-Naver-Client-Id") clientId: String = Constants.clientId,
         @Header("X-Naver-Client-Secret") clientSecret: String = Constants.clientSecret,
         @Query("query") query: String,
-        @Query("display") display: Int? = 1,
+        @Query("display") display: Int? = null,
         @Query("start") start: Int? = null,
         @Query("sort") sort: String? = null,
         @Query("filter") filter: String? = null
