@@ -1,7 +1,6 @@
 package com.nayeon.coroutinestudy
 
 import android.os.Bundle
-import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -16,7 +15,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -101,6 +101,11 @@ class MainActivity : ComponentActivity() {
                                 viewModel.selectedItem = item
                                 navController.navigate(DETAIL_SCREEN_KEY)
                             }
+                    )
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_baseline_star_border_24),
+                        contentDescription = "star border",
+                        tint = Color.Yellow
                     )
                 }
             }
