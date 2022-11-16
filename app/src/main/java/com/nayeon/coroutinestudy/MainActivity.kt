@@ -105,7 +105,10 @@ class MainActivity : ComponentActivity() {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_baseline_star_border_24),
                         contentDescription = "star border",
-                        tint = Color.Yellow
+                        tint = Color.Yellow,
+                        modifier = Modifier.clickable {
+                            // TODO 즐겨찾기 추가
+                        }
                     )
                 }
             }
