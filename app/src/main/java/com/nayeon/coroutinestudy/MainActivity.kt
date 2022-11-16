@@ -1,6 +1,7 @@
 package com.nayeon.coroutinestudy
 
 import android.os.Bundle
+import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -10,21 +11,19 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.nayeon.coroutinestudy.api.Item
 import com.nayeon.coroutinestudy.ui.theme.CoroutineStudyTheme
 import com.skydoves.landscapist.glide.GlideImage
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,12 +44,7 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = SEARCH_SCREEN_KEY) {
                         composable(SEARCH_SCREEN_KEY) { SearchScreen(navController = navController) }
-                        composable(
-                            route = "${DETAIL_SCREEN_KEY}/{${IMAGE_ITEM_KEY}}",
-                            arguments = listOf(navArgument(IMAGE_ITEM_KEY) { type = NavType.ParcelableType(Item::class.java) })
-                        ) { backStackEntry ->
-                            DetailScreen(navController = navController, item = backStackEntry.arguments?.getParcelable(IMAGE_ITEM_KEY) ?: return@composable)
-                        }
+                        composable(DETAIL_SCREEN_KEY) { DetailScreen(navController = navController) }
                     }
                 }
             }
@@ -76,7 +70,8 @@ class MainActivity : ComponentActivity() {
             TextField(
                 value = searchText,
                 onValueChange = { searchText = it },
-                placeholder = { Text("검색어를 입력하세요") }
+                placeholder = { Text("검색어를 입력하세요") },
+                singleLine = true
             )
             Button(onClick = {
                 viewModel.query.value = searchText
@@ -103,7 +98,8 @@ class MainActivity : ComponentActivity() {
                             .fillMaxWidth()
                             .aspectRatio(1.0f)
                             .clickable {
-                                navController.navigate("${DETAIL_SCREEN_KEY}/$item")
+                                viewModel.selectedItem = item
+                                navController.navigate(DETAIL_SCREEN_KEY)
                             }
                     )
                 }
@@ -112,9 +108,18 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun DetailScreen(navController: NavController, item: Item) {
-        DetailImage(navController = navController, thumbnailLink = item.thumbnail)
-        DetailText(title = item.title, width = item.sizeWidth, height = item.sizeHeight)
+    fun DetailScreen(navController: NavController) {
+        val item = viewModel.selectedItem ?: run {
+            navController.navigateUp()
+            return
+        }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            DetailImage(navController = navController, thumbnailLink = item.thumbnail)
+            DetailText(title = item.title, width = item.sizeWidth, height = item.sizeHeight)
+        }
     }
 
     @Composable
@@ -122,6 +127,8 @@ class MainActivity : ComponentActivity() {
         GlideImage(
             imageModel = thumbnailLink,
             modifier = Modifier
+                .height(200.dp)
+                .width(200.dp)
                 .clickable {
                     navController.navigateUp()
                 }
