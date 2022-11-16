@@ -2,6 +2,7 @@ package com.nayeon.coroutinestudy
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
@@ -12,7 +13,7 @@ import com.nayeon.coroutinestudy.api.SearchApi
 import com.nayeon.coroutinestudy.database.LocalApi
 import com.nayeon.coroutinestudy.database.Star
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
 
@@ -31,7 +32,22 @@ class MainViewModel @Inject constructor(
         }.liveData.cachedIn(viewModelScope)
     }.asFlow()
 
+    private val viewModelJob = SupervisorJob()
+
+    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()
+    }
+
     fun addStar(item: Item) {
+        uiScope.launch {
+            saveStar(item)
+        }
+    }
+
+    private suspend fun saveStar(item: Item) = withContext(Dispatchers.Default) {
         localApi.addStar(item)
     }
 

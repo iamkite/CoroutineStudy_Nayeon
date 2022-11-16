@@ -107,7 +107,7 @@ class MainActivity : ComponentActivity() {
                         contentDescription = "star border",
                         tint = Color.Yellow,
                         modifier = Modifier.clickable {
-                            // TODO 즐겨찾기 추가
+                            viewModel.addStar(item)
                         }
                     )
                 }
