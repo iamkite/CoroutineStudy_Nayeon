@@ -11,14 +11,21 @@ class LocalApi @Inject constructor(@ApplicationContext val context: Context) {
 
     fun addStar(item: Item) {
         val starItem = Star(
-            uid = 0,
-            item = item,
-            starred = true
+            urlString = item.link,
+            item = item
         )
         starDao?.insert(starItem)
     }
 
-    fun deleteStar(star: Star) {
-        starDao?.delete(star)
+    fun deleteStar(item: Item) {
+        val starItem = Star(
+            urlString = item.link,
+            item = item
+        )
+        starDao?.delete(starItem)
+    }
+
+    fun isStarredItem() : List<String> {
+        return starDao?.getAllStarredItem() ?: listOf()
     }
 }

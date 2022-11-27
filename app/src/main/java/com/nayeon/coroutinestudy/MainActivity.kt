@@ -9,10 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -84,6 +81,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun SearchImage(navController: NavController) {
         val imageList = viewModel.imageFlow.collectAsLazyPagingItems()
+        val starredList = viewModel.starredListFlow.collectAsState(initial = listOf())
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
@@ -102,14 +100,24 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(DETAIL_SCREEN_KEY)
                             }
                     )
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_baseline_star_border_24),
-                        contentDescription = "star border",
-                        tint = Color.Yellow,
-                        modifier = Modifier.clickable {
-                            viewModel.addStar(item)
-                        }
-                    )
+                    Box {
+                        Icon(
+                            painter = painterResource(
+                                id = if (starredList.value.contains(item.link)) {
+                                    R.drawable.ic_baseline_star_24
+                                } else {
+                                    R.drawable.ic_baseline_star_border_24
+                                }
+                            ),
+                            contentDescription = "star border",
+                            tint = Color.Yellow,
+                            modifier = Modifier
+                                .clickable {
+                                    viewModel.addOrDeleteStar(item)
+                                }
+                                .align(Alignment.TopEnd)
+                        )
+                    }
                 }
             }
         }

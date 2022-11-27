@@ -7,7 +7,6 @@ import com.nayeon.coroutinestudy.api.Item
 
 @Entity
 data class Star(
-    @PrimaryKey(autoGenerate = true) val uid: Int,
+    @PrimaryKey @ColumnInfo(name = "url_string") val urlString: String,
     @ColumnInfo(name = "item") val item: Item,
-    @ColumnInfo(name = "starred") val starred: Boolean
 )

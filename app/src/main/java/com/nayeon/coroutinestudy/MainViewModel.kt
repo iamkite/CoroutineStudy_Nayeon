@@ -8,6 +8,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.liveData
 import androidx.room.Room
+import com.nayeon.coroutinestudy.api.IODispatcher
 import com.nayeon.coroutinestudy.api.Item
 import com.nayeon.coroutinestudy.api.SearchApi
 import com.nayeon.coroutinestudy.database.LocalApi
@@ -20,7 +21,8 @@ import kotlin.coroutines.coroutineContext
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val searchApi: SearchApi,
-    private val localApi: LocalApi
+    private val localApi: LocalApi,
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     val searchText = mutableStateOf("")
     val query = MutableLiveData<String>()
@@ -32,26 +34,29 @@ class MainViewModel @Inject constructor(
         }.liveData.cachedIn(viewModelScope)
     }.asFlow()
 
-    private val viewModelJob = SupervisorJob()
+    val starredList = MutableLiveData<List<String>>()
+    val starredListFlow = starredList.asFlow()
 
-    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
-    }
-
-    fun addStar(item: Item) {
-        uiScope.launch {
-            saveStar(item)
+    fun addOrDeleteStar(item: Item) {
+        viewModelScope.launch {
+            if (starredList.value?.contains(item.link) == true) {
+                deleteStar(item)
+            } else {
+                saveStar(item)
+            }
+            updateStarredList()
         }
     }
 
-    private suspend fun saveStar(item: Item) = withContext(Dispatchers.Default) {
+    private suspend fun saveStar(item: Item) = withContext(ioDispatcher) {
         localApi.addStar(item)
     }
 
-    fun deleteStar(star: Star) {
-        localApi.deleteStar(star)
+    private suspend fun deleteStar(item: Item) = withContext(ioDispatcher) {
+        localApi.deleteStar(item)
+    }
+
+    private suspend fun updateStarredList() = withContext(ioDispatcher) {
+        starredList.postValue(localApi.isStarredItem())
     }
 }
