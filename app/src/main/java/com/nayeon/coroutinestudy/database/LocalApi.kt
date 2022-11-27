@@ -25,7 +25,7 @@ class LocalApi @Inject constructor(@ApplicationContext val context: Context) {
         starDao?.delete(starItem)
     }
 
-    fun isStarredItem() : List<String> {
+    fun getAllStarredItem() : List<Star> {
         return starDao?.getAllStarredItem() ?: listOf()
     }
 }

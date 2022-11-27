@@ -14,6 +14,6 @@ interface StarDao {
     @Delete
     fun delete(star: Star)
 
-    @Query("SELECT url_string FROM star")
-    fun getAllStarredItem() : List<String>
+    @Query("SELECT * FROM star")
+    fun getAllStarredItem() : List<Star>
 }

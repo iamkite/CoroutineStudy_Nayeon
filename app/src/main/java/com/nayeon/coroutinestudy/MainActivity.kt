@@ -50,9 +50,14 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun SearchScreen(navController: NavController) {
+        val searchText: String by remember { viewModel.searchText }
         Column {
             SearchBar()
-            SearchImage(navController = navController)
+            if (searchText.isEmpty()) {
+                StarredImage()
+            } else {
+                SearchImage(navController = navController)
+            }
         }
     }
 
@@ -66,7 +71,12 @@ class MainActivity : ComponentActivity() {
         ) {
             TextField(
                 value = searchText,
-                onValueChange = { searchText = it },
+                onValueChange = {
+                    searchText = it
+                    if (it.isEmpty()) {
+                        viewModel.query.value = it
+                    }
+                },
                 placeholder = { Text("검색어를 입력하세요") },
                 singleLine = true
             )
@@ -81,7 +91,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun SearchImage(navController: NavController) {
         val imageList = viewModel.imageFlow.collectAsLazyPagingItems()
-        val starredList = viewModel.starredListFlow.collectAsState(initial = listOf())
+        val starredLinkList = viewModel.starredLinkListFlow.collectAsState(initial = listOf())
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
@@ -103,7 +113,7 @@ class MainActivity : ComponentActivity() {
                     Box {
                         Icon(
                             painter = painterResource(
-                                id = if (starredList.value.contains(item.link)) {
+                                id = if (starredLinkList.value.contains(item.link)) {
                                     R.drawable.ic_baseline_star_24
                                 } else {
                                     R.drawable.ic_baseline_star_border_24
@@ -118,6 +128,46 @@ class MainActivity : ComponentActivity() {
                                 .align(Alignment.TopEnd)
                         )
                     }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun StarredImage() {
+        val starredItemList = viewModel.starredItemListFlow.collectAsState(initial = listOf())
+        val starredLinkList = viewModel.starredLinkListFlow.collectAsState(initial = listOf())
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            items(starredItemList.value.size) { index ->
+                val item = starredItemList.value[index]
+                GlideImage(
+                    imageModel = item.link,
+                    modifier = Modifier
+                        .wrapContentSize(Alignment.Center)
+                        .fillMaxWidth()
+                        .aspectRatio(1.0f)
+                )
+                Box {
+                    Icon(
+                        painter = painterResource(
+                            id = if (starredLinkList.value.contains(item.link)) {
+                                R.drawable.ic_baseline_star_24
+                            } else {
+                                R.drawable.ic_baseline_star_border_24
+                            }
+                        ),
+                        contentDescription = "star border",
+                        tint = Color.Yellow,
+                        modifier = Modifier
+                            .clickable {
+                                viewModel.addOrDeleteStar(item)
+                            }
+                            .align(Alignment.TopEnd)
+                    )
                 }
             }
         }

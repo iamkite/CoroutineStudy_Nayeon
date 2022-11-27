@@ -2,21 +2,17 @@ package com.nayeon.coroutinestudy
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.*
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.liveData
-import androidx.room.Room
 import com.nayeon.coroutinestudy.api.IODispatcher
 import com.nayeon.coroutinestudy.api.Item
 import com.nayeon.coroutinestudy.api.SearchApi
 import com.nayeon.coroutinestudy.database.LocalApi
-import com.nayeon.coroutinestudy.database.Star
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
-import kotlin.coroutines.coroutineContext
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -26,7 +22,7 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
     val searchText = mutableStateOf("")
     val query = MutableLiveData<String>()
-    var selectedItem : Item? = null
+    var selectedItem: Item? = null
 
     val imageFlow = query.switchMap {
         Pager(PagingConfig(pageSize = 10)) {
@@ -34,12 +30,21 @@ class MainViewModel @Inject constructor(
         }.liveData.cachedIn(viewModelScope)
     }.asFlow()
 
-    val starredList = MutableLiveData<List<String>>()
-    val starredListFlow = starredList.asFlow()
+    private val starredItemList = MutableLiveData<List<Item>>()
+    val starredItemListFlow = starredItemList.asFlow()
+
+    private val starredLinkList = MutableLiveData<List<String>>()
+    val starredLinkListFlow = starredLinkList.asFlow()
+
+    init {
+        viewModelScope.launch {
+            updateStarredList()
+        }
+    }
 
     fun addOrDeleteStar(item: Item) {
         viewModelScope.launch {
-            if (starredList.value?.contains(item.link) == true) {
+            if (starredLinkList.value?.contains(item.link) == true) {
                 deleteStar(item)
             } else {
                 saveStar(item)
@@ -57,6 +62,10 @@ class MainViewModel @Inject constructor(
     }
 
     private suspend fun updateStarredList() = withContext(ioDispatcher) {
-        starredList.postValue(localApi.isStarredItem())
+        val result = localApi.getAllStarredItem()
+        val itemList = result.map { it.item }
+        val linkList = result.map { it.urlString }
+        starredItemList.postValue(itemList)
+        starredLinkList.postValue(linkList)
     }
 }
