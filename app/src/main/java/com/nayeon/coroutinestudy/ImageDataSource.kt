@@ -23,7 +23,7 @@ class ImageDataSource(
 
             LoadResult.Page(
                 data = response.items,
-                prevKey = null,
+                prevKey = if (nextPageNum == 0) null else nextPageNum - 1,
                 nextKey = nextPageNum + 1
             )
         } catch (e: Exception) {
