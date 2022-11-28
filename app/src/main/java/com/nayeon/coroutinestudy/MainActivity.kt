@@ -185,6 +185,7 @@ class MainActivity : ComponentActivity() {
         ) {
             DetailImage(navController = navController, thumbnailLink = item.thumbnail)
             DetailText(title = item.title, width = item.sizeWidth, height = item.sizeHeight)
+            DownloadButton(imgUrl = item.link, title = item.title)
         }
     }
 
@@ -205,6 +206,13 @@ class MainActivity : ComponentActivity() {
     fun DetailText(title: String, width: Int, height: Int) {
         Text(text = title)
         Text("width : $width, height : $height")
+    }
+
+    @Composable
+    fun DownloadButton(imgUrl: String, title: String) {
+        OutlinedButton(onClick = { viewModel.download(imgUrl, title) }) {
+            Text(text = "Download")
+        }
     }
 
     companion object {
