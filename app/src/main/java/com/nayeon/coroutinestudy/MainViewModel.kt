@@ -26,6 +26,10 @@ class MainViewModel @Inject constructor(
     val searchText = mutableStateOf("")
     val query = MutableLiveData<String>()
     var selectedItem: Item? = null
+        set(value) {
+            downloadProgress.postValue(null)
+            field = value
+        }
 
     val imageFlow = query.switchMap {
         Pager(PagingConfig(pageSize = 10)) {
@@ -38,6 +42,9 @@ class MainViewModel @Inject constructor(
 
     private val starredLinkList = MutableLiveData<List<String>>()
     val starredLinkListFlow = starredLinkList.asFlow()
+    
+    private val downloadProgress = MutableLiveData<Int?>()
+    val downloadProgressFlow = downloadProgress.asFlow()
 
     init {
         viewModelScope.launch {
@@ -77,7 +84,6 @@ class MainViewModel @Inject constructor(
             DownloadModule
                 .createDownloadRetrofit {
                     updateProgress(it)
-                    Log.d("PROGRESS", "$it%")
                 }
                 .create(DownloadApi::class.java)
                 .downloadImage(imgUrl).use {
@@ -91,6 +97,6 @@ class MainViewModel @Inject constructor(
     }
 
     private fun updateProgress(progress: Int) {
-        // TODO : progress ui update
+        downloadProgress.postValue(progress)
     }
 }

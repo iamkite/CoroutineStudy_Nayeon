@@ -186,6 +186,7 @@ class MainActivity : ComponentActivity() {
             DetailImage(navController = navController, thumbnailLink = item.thumbnail)
             DetailText(title = item.title, width = item.sizeWidth, height = item.sizeHeight)
             DownloadButton(imgUrl = item.link, title = item.title)
+            DownloadProgress(imgUrl = item.link)
         }
     }
 
@@ -212,6 +213,14 @@ class MainActivity : ComponentActivity() {
     fun DownloadButton(imgUrl: String, title: String) {
         OutlinedButton(onClick = { viewModel.download(imgUrl, title) }) {
             Text(text = "Download")
+        }
+    }
+
+    @Composable
+    fun DownloadProgress(imgUrl: String) {
+        val downloadProgress = viewModel.downloadProgressFlow.collectAsState(initial = null)
+        if (downloadProgress.value != null && imgUrl == viewModel.selectedItem?.link) {
+            Text(text = "download : " + downloadProgress.value.toString() + "%")
         }
     }
 
