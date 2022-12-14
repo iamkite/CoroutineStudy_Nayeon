@@ -1,6 +1,7 @@
 package com.nayeon.coroutinestudy
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -221,6 +222,9 @@ class MainActivity : ComponentActivity() {
         val downloadProgress = viewModel.downloadProgressFlow.collectAsState(initial = null)
         if (downloadProgress.value != null && imgUrl == viewModel.selectedItem?.link) {
             Text(text = "download : " + downloadProgress.value.toString() + "%")
+        }
+        if (downloadProgress.value == 100) {
+            Toast.makeText(this, "Download Complete!", Toast.LENGTH_SHORT).show()
         }
     }
 
