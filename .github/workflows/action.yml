@@ -6,19 +6,12 @@ on:
 jobs:
   add-reviews:
     runs-on: ubuntu-latest
-        labels : test_label
     steps:
-      - uses: kentaro-m/auto-assign-action@v1.2.4
+      - if: ${{ github.event.label.name == 'test_label'}}
+        uses: kentaro-m/auto-assign-action@v1.2.4
         with:
           configuration-path: '.github/autoAssign/auto_assign.yml'
-
-  add-reviews_another:
-    runs-on: ubuntu-latest
-      labels: another_label
-    steps:
-      - uses: kentaro-m/auto-assign-action@v1.2.4
-        with:
-          configuration-path: '.github/autoAssign/auto_assign_another_label.yml'
-
-
-
+      - if: ${{ github.event.label.name == 'another_label'}}
+        uses: kentaro-m/auto-assign-action@v1.2.4
+          with:
+            configuration-path: '.github/autoAssign/auto_assign_another_label.yml'
