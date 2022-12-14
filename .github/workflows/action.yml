@@ -1,4 +1,4 @@
-name: 'Auto Assign'
+name: 'Auto Assign Test'
 on:
   pull_request:
     types: [opened, ready_for_review]
@@ -6,7 +6,19 @@ on:
 jobs:
   add-reviews:
     runs-on: ubuntu-latest
+        labels : test_label
     steps:
       - uses: kentaro-m/auto-assign-action@v1.2.4
         with:
-          configuration-path: '.github/autoAssign/*' # Only needed if you use something other than .github/auto_assign.yml
+          configuration-path: '.github/autoAssign/auto_assign.yml'
+
+  add-reviews_another:
+    runs-on: ubuntu-latest
+      labels: another_label
+    steps:
+      - uses: kentaro-m/auto-assign-action@v1.2.4
+        with:
+          configuration-path: '.github/autoAssign/auto_assign_another_label.yml'
+
+
+
