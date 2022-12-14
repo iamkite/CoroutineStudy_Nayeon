@@ -13,5 +13,5 @@ jobs:
           configuration-path: '.github/autoAssign/auto_assign.yml'
       - if: ${{ github.event.label.name == 'another_label'}}
         uses: kentaro-m/auto-assign-action@v1.2.4
-          with:
-            configuration-path: '.github/autoAssign/auto_assign_another_label.yml'
+        with:
+          configuration-path: '.github/autoAssign/auto_assign_another_label.yml'
