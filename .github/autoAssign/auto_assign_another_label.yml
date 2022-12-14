@@ -1,0 +1,8 @@
+addReviewers: true
+addAssignees: author
+
+
+reviewers:
+  - JungDayoon
+
+numberOfReviewers: 0

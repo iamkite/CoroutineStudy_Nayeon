@@ -1,0 +1,17 @@
+name: 'Auto Assign Test'
+on:
+  pull_request:
+    types: [labeled]
+
+jobs:
+  add-reviews:
+    runs-on: ubuntu-latest
+    steps:
+      - if: ${{ github.event.label.name == 'test_label'}}
+        uses: kentaro-m/auto-assign-action@v1.2.4
+        with:
+          configuration-path: '.github/autoAssign/auto_assign.yml'
+      - if: ${{ github.event.label.name == 'another_label'}}
+        uses: kentaro-m/auto-assign-action@v1.2.4
+        with:
+          configuration-path: '.github/autoAssign/auto_assign_another_label.yml'
